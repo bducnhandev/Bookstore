@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-
 @Service
 @RequiredArgsConstructor
 @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = {Exception.class, Throwable.class})
@@ -20,6 +19,10 @@ public class BookService {
 
     public List<Book> getAllBooks(Integer pageNo, Integer pageSize, String sortBy) {
         return bookRepository.findAllBooks(pageNo, pageSize, sortBy);
+    }
+
+    public List<Book> getAllProducts() {
+        return bookRepository.findAll();
     }
 
     public Optional<Book> getBookById(Long id) {
@@ -31,11 +34,11 @@ public class BookService {
     }
 
     public void updateBook(@NotNull Book book) {
-        Book existingBook = bookRepository.findById(book.getId())
-                .orElse(null);
+        Book existingBook = bookRepository.findById(book.getId()).orElse(null);
         Objects.requireNonNull(existingBook).setTitle(book.getTitle());
         existingBook.setAuthor(book.getAuthor());
         existingBook.setPrice(book.getPrice());
+        existingBook.setImage(book.getImage());
         existingBook.setCategory(book.getCategory());
         bookRepository.save(existingBook);
     }
