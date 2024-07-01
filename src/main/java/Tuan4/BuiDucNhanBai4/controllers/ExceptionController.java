@@ -16,13 +16,10 @@ public class ExceptionController implements ErrorController {
     @GetMapping
     public String handleError(@NotNull HttpServletRequest request) {
         return Optional
-                .ofNullable(request.getAttribute(
-                        RequestDispatcher.ERROR_STATUS_CODE))
+                .ofNullable(request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE))
                 .map(status -> Integer.parseInt(status.toString()))
-                .filter(status -> status == 404
-                        || status == 500
-                        || status == 403)
-                .map(status -> "error/" + status)
+                .filter(status -> status == 404 || status == 500 || status == 403)
+                .map(status -> "errors/" + status)
                 .orElse(null);
     }
 }

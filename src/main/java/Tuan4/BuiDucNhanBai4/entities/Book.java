@@ -71,4 +71,3 @@ public class Book {
         return getClass().hashCode();
     }
 }
-
