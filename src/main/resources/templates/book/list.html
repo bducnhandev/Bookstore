@@ -28,37 +28,81 @@
         </div>
     </div>
 
-    <table class="table">
-        <thead>
-        <tr>
-            <th><a th:href="@{/books(pageNo=${currentPage}, sortBy='id')}">Id</a></th>
-            <th><a th:href="@{/books(pageNo=${currentPage}, sortBy='title')}">Title</a></th>
-            <th><a th:href="@{/books(pageNo=${currentPage}, sortBy='author')}">Author</a></th>
-            <th><a th:href="@{/books(pageNo=${currentPage}, sortBy='price')}">Price</a></th>
-            <th><a th:href="@{/books(pageNo=${currentPage}, sortBy='category')}">Category</a></th>
-            <th>Action</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="book : ${books}">
-            <td th:text="${book.getId()}"></td>
-            <td th:text="${book.getTitle()}"></td>
-            <td th:text="${book.getAuthor()}"></td>
-            <td th:text="${book.getPrice()}"></td>
-            <td th:text="${book.getCategory().getName()}"></td>
-            <td colspan="2">
-                <a class="btn btn-primary" sec:authorize="hasAnyAuthority('ADMIN')" th:href="@{/books/edit/{id}(id=${book.getId()})}">Edit</a>
-                <a class="btn btn-danger" sec:authorize="hasAnyAuthority('ADMIN')" th:href="@{/books/delete/{id}(id=${book.getId()})}" onclick="return confirm('Are you sure you want to delete this book?')">Delete</a>
-                <form th:action="@{/books/add-to-cart}" method="post" class="d-inline">
-                    <input type="hidden" name="id" th:value="${book.getId()}">
-                    <input type="hidden" name="name" th:value="${book.getTitle()}">
-                    <input type="hidden" name="price" th:value="${book.getPrice()}">
-                    <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to add this book to cart?')">Add to cart</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+<!--    <table class="table">-->
+<!--        <thead>-->
+<!--        <tr>-->
+<!--            <th><a th:href="@{/books(pageNo=${currentPage}, sortBy='id')}">Id</a></th>-->
+<!--            <th><a th:href="@{/books(pageNo=${currentPage}, sortBy='title')}">Title</a></th>-->
+<!--            <th><a th:href="@{/books(pageNo=${currentPage}, sortBy='author')}">Author</a></th>-->
+<!--            <th><a th:href="@{/books(pageNo=${currentPage}, sortBy='price')}">Price</a></th>-->
+<!--            <th><a th:href="@{/books(pageNo=${currentPage}, sortBy='category')}">Category</a></th>-->
+<!--            <th>Action</th>-->
+<!--        </tr>-->
+<!--        </thead>-->
+<!--        <tbody>-->
+<!--        <tr th:each="book : ${books}">-->
+<!--            <td th:text="${book.getId()}"></td>-->
+<!--            <td th:text="${book.getTitle()}"></td>-->
+<!--            <td th:text="${book.getAuthor()}"></td>-->
+<!--            <td th:text="${book.getPrice()}"></td>-->
+<!--            <td th:text="${book.getCategory().getName()}"></td>-->
+<!--            <td colspan="2">-->
+<!--                <a class="btn btn-primary" sec:authorize="hasAnyAuthority('ADMIN')" th:href="@{/books/edit/{id}(id=${book.getId()})}">Edit</a>-->
+<!--                <a class="btn btn-danger" sec:authorize="hasAnyAuthority('ADMIN')" th:href="@{/books/delete/{id}(id=${book.getId()})}" onclick="return confirm('Are you sure you want to delete this book?')">Delete</a>-->
+<!--                <form th:action="@{/books/add-to-cart}" method="post" class="d-inline">-->
+<!--                    <input type="hidden" name="id" th:value="${book.getId()}">-->
+<!--                    <input type="hidden" name="name" th:value="${book.getTitle()}">-->
+<!--                    <input type="hidden" name="price" th:value="${book.getPrice()}">-->
+<!--                    <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to add this book to cart?')">Add to cart</button>-->
+<!--                </form>-->
+<!--            </td>-->
+<!--        </tr>-->
+<!--        </tbody>-->
+<!--    </table>-->
+
+    <div class="p-4">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-4">
+            <div th:each="book : ${books}" class="col">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <!-- Hiển thị ảnh sản phẩm -->
+                        <img th:src="@{/images/{image}(image=${book.image})}" alt="Product Image" class="card-img-top my-2 img-fluid" style="width: 100%; height: 200px;">
+
+                        <!-- Hiển thị tên sách -->
+                        <h3 class="card-title mt-2">
+                            <a th:href="@{/books/details/{id}(id=${book.id})}" th:text="${book.title}" class="text-decoration-none"></a>
+                        </h3>
+
+                        <!-- Hiển thị giá sách -->
+                        <div class="text-danger h5 font-weight-bold mt-2" th:text="${#numbers.formatInteger(book.price, 0)} + 'đ'"></div>
+
+                        <!-- Đánh giá và số lượng -->
+                        <div class="d-flex align-items-center mt-2">
+                            <span class="text-warning">4.2</span>
+                            <span class="text-muted small ms-1">(9)</span>
+                        </div>
+
+                        <!-- Nút hành động -->
+                        <div class="mt-auto">
+                            <div sec:authorize="hasAnyAuthority('ADMIN')" class="d-flex justify-content-between">
+                                <a th:href="@{/books/edit/{id}(id=${book.id})}" class="btn btn-success btn-sm">Edit</a>
+                                <a th:href="@{/books/delete/{id}(id=${book.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+                            </div>
+
+                            <!-- Form thêm vào giỏ hàng -->
+                            <form th:action="@{/books/add-to-cart}" method="post" class="text-center mt-3">
+                                <input type="hidden" name="id" th:value="${book.getId()}">
+                                <input type="hidden" name="name" th:value="${book.getTitle()}">
+                                <input type="hidden" name="price" th:value="${book.getPrice()}">
+                                <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to add this book to cart?')">Add to cart</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-center pagination-sm" th:each="i : ${#numbers.sequence(0, totalPages)}">
@@ -68,7 +112,6 @@
         </ul>
     </nav>
 </div>
-
 <th:block th:replace="~{layout::footer}"></th:block>
 </body>
 </html>

@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,9 +41,17 @@ public class BookService {
         existingBook.setAuthor(book.getAuthor());
         existingBook.setPrice(book.getPrice());
         existingBook.setImage(book.getImage());
+
+        if (existingBook.getImages() == null) {
+            existingBook.setImages(new HashSet<>());
+        }
+        existingBook.getImages().clear();
+        existingBook.getImages().addAll(book.getImages());
+
         existingBook.setCategory(book.getCategory());
         bookRepository.save(existingBook);
     }
+
 
     public void deleteBookById(Long id) {
         bookRepository.deleteById(id);

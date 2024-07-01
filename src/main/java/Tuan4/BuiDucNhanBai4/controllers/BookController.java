@@ -113,18 +113,28 @@ public class BookController {
     {
         var book = bookService.getBookById(id);
         model.addAttribute("book", book.orElseThrow(() -> new IllegalArgumentException("Book not found")));
-        model.addAttribute("categories",
-                categoryService.getAllCategories());
+        model.addAttribute("categories", categoryService.getAllCategories());
         return "book/edit";
+    }
+
+    @GetMapping("/details/{id}")
+    public String showProduct(@PathVariable long id, @NotNull Model model) {
+        Book book = bookService.getBookById(id).orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + id));
+        model.addAttribute("book", book);
+        model.addAttribute("categories", categoryService.getAllCategories());
+        return "book/details-book";
     }
 
     @PostMapping("/edit")
     public String editBook(@Valid @ModelAttribute("book") Book book,
                            @RequestParam("imageFile") MultipartFile imageFile,
+                           @RequestParam("imageFiles") MultipartFile[] imageFiles,
                            @NotNull BindingResult bindingResult,
                            Model model) {
         if (bindingResult.hasErrors()) {
-            var errors = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toArray(String[]::new);
+            var errors = bindingResult.getAllErrors().stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .toArray(String[]::new);
             model.addAttribute("errors", errors);
             model.addAttribute("categories", categoryService.getAllCategories());
             return "book/edit";
@@ -138,6 +148,28 @@ public class BookController {
             }
             book.setImage(imagePath);
         }
+
+        Set<ProductImage> newImages = new HashSet<>();
+        for (MultipartFile image : imageFiles) {
+            if (!image.isEmpty()) {
+                String fileName = null;
+                try {
+                    fileName = saveImage(image);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                ProductImage productImage = new ProductImage();
+                productImage.setImageurl(fileName);
+                productImage.setBook(book);
+                newImages.add(productImage);
+            }
+        }
+
+        if (book.getImages() == null) {
+            book.setImages(new HashSet<>());
+        }
+        book.getImages().addAll(newImages);
+
         bookService.updateBook(book);
         return "redirect:/books";
     }
