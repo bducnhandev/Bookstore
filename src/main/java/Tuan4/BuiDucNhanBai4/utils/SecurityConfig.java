@@ -43,15 +43,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(@NotNull HttpSecurity http) throws Exception {
         return http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/", "/oauth/**", "/register", "/error")
                         .permitAll()
-                        .requestMatchers("/books/edit/**", "/books/add", "/books/delete")
+                        .requestMatchers("/books/edit/**", "/books/add", "/books/delete", "/books/management")
                         .hasAnyAuthority("ADMIN")
                         .requestMatchers("/books", "/cart", "/cart/**")
                         .hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers("/api/**")
-                        .hasAnyAuthority("ADMIN", "USER")
+//                        .permitAll()
+                        .hasAnyAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .logout(logout -> logout

@@ -23,10 +23,6 @@ public class BookService {
         return bookRepository.findAllBooks(pageNo, pageSize, sortBy);
     }
 
-    public List<Book> getAllProducts() {
-        return bookRepository.findAll();
-    }
-
     public Optional<Book> getBookById(Long id) {
         return bookRepository.findById(id);
     }
